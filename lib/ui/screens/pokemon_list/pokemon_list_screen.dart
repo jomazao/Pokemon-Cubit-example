@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_architecture/ui/screens/pokemon_list/pokemon_list_cubit.dart';
+import 'package:flutter_architecture/ui/screens/pokemon_list/pokemon_list_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PokemonListScreen extends StatelessWidget {
@@ -7,10 +8,10 @@ class PokemonListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => PokemonListCubit()..next(),
-      child: BlocBuilder<PokemonListCubit, List<String>>(
+      child: BlocBuilder<PokemonListCubit, PokemonListState>(
           builder: (context, state) {
         var cubit = BlocProvider.of<PokemonListCubit>(context);
-        var pokemonList = state;
+        var pokemonList = state.pokemonList;
 
         return Scaffold(
           floatingActionButton: Row(
@@ -37,19 +38,29 @@ class PokemonListScreen extends StatelessWidget {
               'Todos los Pokémon',
             ),
           ),
-          body: ListView(
-            children: pokemonList
-                .map(
-                  (e) => Text(
-                    e,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.red,
-                    ),
-                  ),
-                )
-                .toList(),
+          body: Stack(
+            children: [
+              Visibility(
+                visible: state is Loading,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              ListView(
+                children: pokemonList
+                    .map(
+                      (e) => Text(
+                        e,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.red,
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
           ),
         );
       }),
